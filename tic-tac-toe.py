@@ -10,7 +10,7 @@ class Environment:
         self.o = -1
         self.winner = None
         self.ended = False
-        #self.state = 
+        self.numberOfStates = 3 ** (boardLength*boardLength)
         
         
     def isEmpty(self, i, j):
@@ -30,9 +30,9 @@ class Environment:
         stateDecimal = 0
         for i in range(boardLength):
             for j in range(boardLength):
-                if (self.board[i,j] == 0):
+                if self.board[i,j] == 0:
                     num = 0
-                elif (self.board[i,j] == self.x):
+                elif self.board[i,j] == self.x:
                     num = 1
                 else:
                     num = 2
@@ -50,9 +50,9 @@ class Environment:
                 if self.board[i].sum() == player*winningLength:
                     self.winner = player
                     self.ended = True
-                    print("rows matched")
-                    print(player)
-                    print(self.board)
+                    #print("rows matched")
+                    #print(player)
+                    #print(self.board)
                     return True
         
         #check for columns
@@ -61,9 +61,9 @@ class Environment:
                 if self.board[:,i].sum() == player*winningLength:
                     self.winner = player
                     self.ended = True
-                    print("columns matched")
-                    print(player)
-                    print(self.board)
+                    #print("columns matched")
+                    #print(player)
+                    #print(self.board)
                     return True
         
         #check for diagonals
@@ -71,17 +71,17 @@ class Environment:
             if self.board.trace() == player*winningLength:
                 self.winner = player
                 self.ended = True
-                print("1st diagonal matched")
-                print(player)
-                print(self.board)
+                #print("1st diagonal matched")
+                #print(player)
+                #print(self.board)
                 return True
             
             if np.fliplr(self.board).trace() == player*winningLength:
                 self.winner = player
                 self.ended = True
-                print("2nd diagonal matched")
-                print(player)
-                print(self.board)
+                #print("2nd diagonal matched")
+                #print(player)
+                #print(self.board)
                 return True
             
         k = 0
@@ -91,8 +91,8 @@ class Environment:
                     k += 1
         
         if (k == boardLength*boardLength):
-            print("draw")
-            print(self.board)
+            #print("draw")
+            #print(self.board)
             return True
         
         return False
@@ -126,11 +126,14 @@ class Environment:
 class Agent:
     
     #s
-    def __init__(self, eps=0.1, alpha=0.5): 
+    def __init__(self, eps=0.3, alpha=0.5): 
         self.eps = eps
         self.alpha = alpha
         self.verbose = False
         self.stateHistory = []
+
+    def setEpsilon(self, epsilon):
+        self.eps = epsilon
         
     def setValue(self, value):
         self.value = value
@@ -148,32 +151,32 @@ class Agent:
         move = []
         r = np.random.random()
         if (r < self.eps):
-            if self.verbose:
-                print ("Taking random action")
             possibleMoves = []
             for i in range(boardLength):
                 for j in range(boardLength):
                     if env.isEmpty(i,j):
                         possibleMoves.append((i,j))
             #print(possibleMoves)
+            if self.verbose:
+                print("Hola")
             r = np.random.choice(len(possibleMoves))
             move = possibleMoves[r]
         else:
             x = -1
             y = -1
-            maxValue = 0
+            maxValue = -1
             valueTable = np.zeros((3,3))
             for i in range(boardLength):
                 for j in range(boardLength):
                     if env.isEmpty(i,j):
                         env.board[i,j] = self.symbol
-                        k = env.getState()
-                        valueTable[i,j] = self.value[k]
+                        state = env.getState()
+                        valueTable[i,j] = self.value[state]
                         env.board[i,j] = 0
-                        if self.value[k] > maxValue:
+                        if self.value[state] > maxValue:
                             x = i
                             y = j
-                            maxValue = self.value[k]
+                            maxValue = self.value[state]
                     else:
                         valueTable[i,j] = env.board[i,j]
             move = (x,y)
@@ -225,6 +228,64 @@ class Human:
         pass
 
 
+def getAllStatesAndWinners(env, x=0, y=0):
+
+    results = []
+    for i in (0, env.x, env.o):
+
+        env.board[x,y] = i
+        if y == 2:
+
+            if x == 2:
+
+                #have reached the last point
+                state = env.getState()
+                isGameOver = env.gameOver()
+                winner = env.winner
+                results.append((state, winner, isGameOver))
+
+            else:
+                results += getAllStatesAndWinners(env, x+1, 0)
+        else:
+            results += getAllStatesAndWinners(env, x,y+1)
+
+    return results
+
+
+def initialV_x(env, state_winner_triples):
+    # initialize state values as follows
+    # if x wins, V(s) = 1
+    # if x loses or draw, V(s) = 0
+    # otherwise, V(s) = 0.5
+    V = np.zeros(env.numberOfStates)
+    for state, winner, ended in state_winner_triples:
+        if ended:
+            if winner == env.x:
+                v = 1
+            else:
+                v = 0
+        else:
+            v = 0.5
+        V[state] = v
+    return V
+
+
+def initialV_o(env, state_winner_triples):
+  # this is (almost) the opposite of initial V for player x
+  # since everywhere where x wins (1), o loses (0)
+  # but a draw is still 0 for o
+    V = np.zeros(env.numberOfStates)
+    for state, winner, ended in state_winner_triples:
+        if ended:
+            if winner == env.o:
+                v = 1
+            else:
+                v = 0
+        else:
+            v = 0.5
+        V[state] = v
+    return V
+
 def playGame(p1, p2, board, draw=False):
     
     currentPlayer = None
@@ -250,9 +311,9 @@ def playGame(p1, p2, board, draw=False):
         #if draw:
         #    board.drawBoard()
         
-        #update the value functions
-        p1.update(board)
-        p2.update(board)
+    #update the value functions
+    p1.update(board)
+    p2.update(board)
         
         
 if __name__ == '__main__':
@@ -261,23 +322,28 @@ if __name__ == '__main__':
     p2 = Agent()
     
     env = Environment()
+    state_winner_triples = getAllStatesAndWinners(env)
     p1.setSymbol(env.x)
+    Vx = initialV_x(env, state_winner_triples)
+    Vo = initialV_o(env, state_winner_triples)
+    print(Vx)
     p2.setSymbol(env.o)
     p1.setVerbose(False)
     p2.setVerbose(False)
-    p1.setValue([0.5] * 3**9)
-    p2.setValue([0.5] * 3**9)
+    p1.setValue(Vx)
+    p2.setValue(Vo)
     
-    for i in range(10):
+    for i in range(10000):
         playGame(p1, p2, Environment())
         #print ("-------------")
         
     # play human vs. agent
     # do you think the agent learned to play the game well?
-    '''human = Human()
+    human = Human()
     human.setSymbol(env.o)
     while True:
         p1.setVerbose(True)
+        p1.setEpsilon(-2)
         playGame(p1, human, Environment(), draw=2)
         #print (env.board)
         # I made the agent player 1 because I wanted to see if it would
@@ -285,4 +351,4 @@ if __name__ == '__main__':
         # to go second you can switch the human and AI.
         answer = input("Play again? [Y/n]: ")
         if answer and answer.lower()[0] == 'n':
-            break'''
+            break
