@@ -96,16 +96,16 @@ def standardGrid():
 def negativeGrid(stepCost=-0.1):
 	# in this game we want to try to minimize the number of moves
 	# so we will penalize every move
-	g = standard_grid()
+	g = standardGrid()
 	g.rewards.update({
-		(0, 0): step_cost,
-		(0, 1): step_cost,
-		(0, 2): step_cost,
-		(1, 0): step_cost,
-		(1, 2): step_cost,
-		(2, 0): step_cost,
-		(2, 1): step_cost,
-		(2, 2): step_cost,
-		(2, 3): step_cost,
+		(0, 0): stepCost,
+		(0, 1): stepCost,
+		(0, 2): stepCost,
+		(1, 0): stepCost,
+		(1, 2): stepCost,
+		(2, 0): stepCost,
+		(2, 1): stepCost,
+		(2, 2): stepCost,
+		(2, 3): stepCost,
 		})
 	return g
