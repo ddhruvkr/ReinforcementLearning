@@ -2,11 +2,11 @@ import numpy as np
 from grid_world import standardGrid
 
 smallEnough = 10e-4
-def print_values(V, g):
-  for i in range(g.width):
+def printValues(valueF, grid):
+  for i in range(grid.width):
     print ("---------------------------")
-    for j in range(g.height):
-      v = V.get((i,j), 0)
+    for j in range(grid.height):
+      v = valueF.get((i,j), 0)
       if v >= 0:
         print (" %.2f|" % v, end="")
       else:
@@ -14,11 +14,11 @@ def print_values(V, g):
     print ("")
 
 
-def print_policy(P, g):
-  for i in range(g.width):
+def printPolicy(policyF, grid):
+  for i in range(grid.width):
     print ("---------------------------")
-    for j in range(g.height):
-      a = P.get((i,j), ' ')
+    for j in range(grid.height):
+      a = policyF.get((i,j), ' ')
       print ("  %s  |" % a, end="")
     print ("")
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 			break
 
 	print ("values for uniformly random actions:")
-	print_values(valueF, grid)
+	printValues(valueF, grid)
 	print ("\n\n")
 
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 	(2, 2): 'R',
 	(2, 3): 'U',
 	}
-	print_policy(policy, grid)
+	printPolicy(policy, grid)
 				
 	valueF = {}
 	for s in states:
@@ -104,5 +104,5 @@ if __name__ == '__main__':
 			break
 
 	print ("values for uniformly random actions:")
-	print_values(valueF, grid)
+	printValues(valueF, grid)
 	print ("\n\n")
