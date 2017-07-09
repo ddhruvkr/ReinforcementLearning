@@ -27,7 +27,7 @@ if __name__ == '__main__':
 	print('Hola')
 	grid = standardGrid()
 	states = grid.allStates()
-
+	print (grid.reward)
 	valueF = {}
 	for s in states:
 		valueF[s] = 0
