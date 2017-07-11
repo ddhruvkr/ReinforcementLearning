@@ -41,6 +41,8 @@ class Grid:
 		return (self.x, self.y) not in self.actions
 
 	def move(self, action):
+		#first check if the action is even possible or not, so that the agent does not go outside the grid
+		#if not possible then dont do anything
 		if action in self.actions[(self.x, self.y)]:
 			if action == 'U':
 				self.x -= 1
