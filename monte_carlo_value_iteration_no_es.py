@@ -15,7 +15,7 @@ def randomAction(a, eps=0.1):
 	else:
 		return np.random.choice(allActions)
 
-def playGame(grid, policy, n):
+def playGame(grid, policy):
 	
 	s = (2,0)
 	statesActionsRewardsList = []
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 	for n in range(2000):
 		#print(n)
 		seenStates = set()
-		stateActionsReturnsList = playGame(grid, policy, n)
+		stateActionsReturnsList = playGame(grid, policy)
 		for s,a,r in stateActionsReturnsList:
 			if (s,a) not in seenStates:
 				#first visit policy
