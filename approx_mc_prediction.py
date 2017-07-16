@@ -54,7 +54,7 @@ if __name__ == '__main__':
 		if s in grid.actions:
 			valueF[s] = theta.dot(s2x(s))
 		else:
-			# terminal state
+			# terminal statea
 			valueF[s] = 0
 
 	print ("final values:")
