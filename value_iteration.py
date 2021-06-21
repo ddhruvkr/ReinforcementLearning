@@ -64,26 +64,27 @@ if __name__ == '__main__':
 		printValues(valueF, grid)
 		print ("\n\n")
 
-		#policy improvement step
-		isPolicyChanged = False
-		for s in states:
+	#policy improvement step
+	# do policy improvement only once compared to policy iteration where this is also done within the outer loop
+	isPolicyChanged = False
+	for s in states:
 
-			if s in policy:
-				newValue = 0
-				oldPolicy = policy[s]
-				newPolicy = None 
-				bestValue = float('-inf')
-				pA = 1
-				for a in allActions:
-					grid.setState(s)
-					# moves and returns a reward which we get on moving
-					r = grid.move(a)
-					newValue = pA * (r + gamma*(valueF[grid.getCurrentState()]))
-					if newValue > bestValue:
-						bestValue = newValue
-						newPolicy = a	
+		if s in policy:
+			newValue = 0
+			oldPolicy = policy[s]
+			newPolicy = None 
+			bestValue = float('-inf')
+			pA = 1
+			for a in allActions:
+				grid.setState(s)
+				# moves and returns a reward which we get on moving
+				r = grid.move(a)
+				newValue = pA * (r + gamma*(valueF[grid.getCurrentState()]))
+				if newValue > bestValue:
+					bestValue = newValue
+					newPolicy = a	
 
-				policy[s] = newPolicy
+			policy[s] = newPolicy
 
 	print ("values for uniformly random actions:")
 	printValues(valueF, grid)
